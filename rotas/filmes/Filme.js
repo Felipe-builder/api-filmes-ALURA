@@ -13,6 +13,7 @@ class Filme {
     }
 
     async criar () {
+        this.validar()
         const resultado = await TabelaFilme.inserir({
             titulo: this.titulo,
             dtLancamento: moment(this.dtLancamento, "DD/MM/YYYY").format(),
@@ -53,6 +54,22 @@ class Filme {
 
         await TabelaFilme.atualizar(this.id, dadosParaAtualizar)
 
+    }
+
+    remover() {
+        return TabelaFilme.remover(this.id)
+    }
+
+    validar () {
+        const campos = ['titulo', 'dtLancamento', 'genero']
+
+        campos.forEach(campo => {
+            const valor = this[campo]
+
+            if (typeof valor !== 'string' || valor.length === 0) {
+                throw new Error(`O campo '${campo}' está inválido`)
+            }
+        })
     }
 }
 
