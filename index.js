@@ -5,7 +5,10 @@ const config = require('config')
 
 app.use(bodyParser.json())
 
-const roteador = require('./rotas/filmes')
-app.use('/api/filmes', roteador)
+const roteadorFilmes = require('./rotas/filmes')
+app.use('/api/filmes', roteadorFilmes)
+
+const roteadorUsuarios = require('./rotas/usuarios')
+app.use('/api/usuarios', roteadorUsuarios)
 
 app.listen(config.get('api.porta'), () => console.log('API em funcionamento!'))
