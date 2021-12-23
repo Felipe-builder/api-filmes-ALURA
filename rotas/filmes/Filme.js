@@ -1,5 +1,7 @@
 const TabelaFilme = require('./TabelaFilme')
 const moment = require('moment')
+const CampoInvalido = require('../../erros/CampoInvalido')
+const DadosNaoFornecidos = require('../../erros/DadosNaoFornecidos')
 
 class Filme {
     constructor ({ id, titulo, dtLancamento, genero, dtRegistro, dtAtualizacao, versao }) {
@@ -49,7 +51,8 @@ class Filme {
         })
 
         if (Object.keys(dadosParaAtualizar).length === 0) {
-            throw new Error('Não foram fornecidos dados para atualizar!')
+            throw new DadosNaoFornecidos()
+            
         }
 
         await TabelaFilme.atualizar(this.id, dadosParaAtualizar)
@@ -67,7 +70,7 @@ class Filme {
             const valor = this[campo]
 
             if (typeof valor !== 'string' || valor.length === 0) {
-                throw new Error(`O campo '${campo}' está inválido`)
+                throw new CampoInvalido(campo)
             }
         })
     }

@@ -8,7 +8,7 @@ roteador.get('/', async (req, res) => {
     res.send(JSON.stringify(resultados))
 })
 
-roteador.post('/', async (req, res) => {
+roteador.post('/', async (req, res, proximo) => {
     try {
         const dadosRecebidos = req.body
         const filme = new Filme(dadosRecebidos)
@@ -18,16 +18,11 @@ roteador.post('/', async (req, res) => {
             JSON.stringify(filme)
         )
     } catch (erro) {
-        res.status(400)
-        res.send(
-            JSON.stringify({
-                mensagem: erro.message
-            })
-        )
+        proximo(erro)
     }
 })
 
-roteador.get('/:idFilme', async (req, res) => {
+roteador.get('/:idFilme', async (req, res, proximo) => {
     try {
         const id = req.params.idFilme
         const filme = new Filme({ id: id })
@@ -37,16 +32,11 @@ roteador.get('/:idFilme', async (req, res) => {
             JSON.stringify(filme)
         )
     } catch (erro) {
-        res.status(404)
-        res.send(
-            JSON.stringify({
-                mensagem: erro.message
-            })
-        )
+        proximo(erro)
     }
 })
 
-roteador.put('/:idFilme', async (req, res) => {
+roteador.put('/:idFilme', async (req, res, proximo) => {
     try {
         const id = req.params.idFilme
         const dadosRecebidos = req.body
@@ -56,17 +46,12 @@ roteador.put('/:idFilme', async (req, res) => {
         res.status(204)
         res.end()
     } catch (erro) {
-        res.status(400)
-        res.send(
-            JSON.stringify({
-                mensagem: erro.message
-            })
-        )
+        proximo(erro)
     }
     
 })
 
-roteador.delete('/:idFilme', async (req, res) => {
+roteador.delete('/:idFilme', async (req, res, proximo) => {
     try {
         const id = req.params.idFilme
         const filme = new Filme( { id: id })
@@ -75,12 +60,7 @@ roteador.delete('/:idFilme', async (req, res) => {
         res.status(204)
         res.end()
     } catch (erro) {
-        res.status(404)
-        res.send(
-            JSON.stringify({
-                menssagem: erro.message
-            })
-        )
+        proximo(erro)
     }
 })
 

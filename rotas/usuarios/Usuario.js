@@ -1,4 +1,6 @@
+const CampoInvalido = require('../../erros/CampoInvalido')
 const TabelaUsuario = require('./TabelaUsuario')
+const DadosNaoFornecidos = require('../../erros/DadosNaoFornecidos')
 
 class Usuario {
     constructor({ id, nome, email, saldo, tipo, dtCriacao, dtAtualizacao, versao}) {
@@ -13,6 +15,7 @@ class Usuario {
     }
 
     async criar() {
+        this.validar()
         const resultado = await TabelaUsuario.criar({
             nome: this.nome,
             email: this.email,
@@ -50,10 +53,25 @@ class Usuario {
             }
 
             if (Object.keys(dadosParaAtualizar).length === 0) {
-                throw new Error('Não foram fornecidos dados para atualizar!')
+                throw new DadosNaoFornecidos()
             }
 
             TabelaUsuario.atualizar(this.id, dadosParaAtualizar)
+        })
+    }
+
+    remover() {
+        return TabelaUsuario.remover(this.id)
+    }
+
+    validar () {
+        const campos = ['nome', 'email', 'saldo', 'tipo']
+
+        campos.forEach((campo) => {
+            const valor = this[campo]
+            if(typeof valor !== 'string' || valor.length === 0) {
+                throw new CampoInvalido(campo)
+            }
         })
     }
 }
