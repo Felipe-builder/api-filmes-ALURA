@@ -1,11 +1,17 @@
 const roteador = require('express').Router()
 const TabelaFilme = require('./TabelaFilme')
 const Filme = require('./Filme')
+const SerializadorFilme = require('../../Serializador').SerializadorFilme
 
 roteador.get('/', async (req, res) => {
     const resultados = await TabelaFilme.listar()
     res.status(200)
-    res.send(JSON.stringify(resultados))
+    const serializador = new SerializadorFilme(
+        res.getHeader('Content-Type')
+    )
+    res.send(
+        serializador.serializar(resultados)
+    )
 })
 
 roteador.post('/', async (req, res, proximo) => {
@@ -14,8 +20,11 @@ roteador.post('/', async (req, res, proximo) => {
         const filme = new Filme(dadosRecebidos)
         await filme.criar()
         res.status(201)
+        const serializador = new SerializadorFilme(
+            res.getHeader('Content-Type')
+        )
         res.send(
-            JSON.stringify(filme)
+            serializador.serializar(filme)
         )
     } catch (erro) {
         proximo(erro)
@@ -28,8 +37,13 @@ roteador.get('/:idFilme', async (req, res, proximo) => {
         const filme = new Filme({ id: id })
         await filme.carregar()
         res.status(200)
+        const serializador = new SerializadorFilme(
+            res.getHeader('Content-Type'),
+            ['dtRegistro', 'dtAtualizacao', 'versao']
+
+        )
         res.send(
-            JSON.stringify(filme)
+            serializador.serializar(filme)
         )
     } catch (erro) {
         proximo(erro)

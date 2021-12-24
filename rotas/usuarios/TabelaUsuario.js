@@ -3,7 +3,7 @@ const Modelo = require('./ModeloTabelaUsuario')
 
 module.exports = {
     listar() {
-        return Modelo.findAll()
+        return Modelo.findAll({ raw: true })
     },
     criar(usuario) {
         return Modelo.create(usuario)

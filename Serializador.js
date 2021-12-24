@@ -8,14 +8,79 @@ class Serializador {
 
     serializar(dados){
         if (this.contentType === 'application/json') {
-            return this.json(dados)
+            return this.json(
+                this.filtrar(dados)
+            )
         }
 
         throw new ValorNaoSuportado(this.contentType)
+    }
+
+    filtrarObjeto(dados) {
+        const novoObjeto = {}
+        this.camposPublicos.forEach((campo) => {
+            if(dados.hasOwnProperty(campo)) {
+                novoObjeto[campo] = dados[campo]
+            }
+        })
+
+        return novoObjeto
+    }
+
+    filtrar(dados){
+        if(Array.isArray(dados)){
+            dados = dados.map(item => {
+                return this.filtrarObjeto(item)
+            })           
+        } else {
+            dados = this.filtrarObjeto(dados)
+        }
+
+        return dados
+    }
+}
+
+class SerializadorFilme extends Serializador {
+    constructor(contentType, camposExtras) {
+        super()
+        this.contentType = contentType
+        this.camposPublicos = [
+            'id',
+            'titulo',
+            'dtLancamento',
+            'genero'
+        ].concat(camposExtras || [])
+    }
+}
+
+class SerializadorUsuario extends Serializador {
+    constructor(contentType, camposExtras) {
+        super()
+        this.contentType = contentType
+        this.camposPublicos = [
+            'id',
+            'nome',
+            'saldo',
+            'tipo'
+        ].concat(camposExtras || [])
+    }
+}
+
+class SerializadorErro extends Serializador {
+    constructor(contentType, camposExtras) {
+        super()
+        this.contentType = contentType
+        this.camposPublicos = [
+            'id',
+            'mensagem'
+        ].concat(camposExtras || [])
     }
 }
 
 module.exports = {
     Serializador: Serializador,
-    formatosAceitos: ['application/json']
+    formatosAceitos: ['application/json'],
+    SerializadorFilme: SerializadorFilme,
+    SerializadorUsuario: SerializadorUsuario,
+    SerializadorErro: SerializadorErro
 }

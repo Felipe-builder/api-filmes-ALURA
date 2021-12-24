@@ -1,14 +1,18 @@
 const roteador = require('express').Router()
+const { SerializadorUsuario } = require('../../Serializador')
 const TabelaUsuario = require('./TabelaUsuario')
 const Usuario = require('./Usuario')
-const NaoEncontrado = require('../../erros/NaoEncontrado')
+
 
 
 roteador.get('/', async (req, res) => {
     const resultados = await TabelaUsuario.listar()
     res.status(200)
+    const serializador = new SerializadorUsuario(
+        res.getHeader('Content-Type')
+    )
     res.send(
-        JSON.stringify(resultados)
+        serializador.serializar(resultados)
     )
 })
 
@@ -18,6 +22,9 @@ roteador.post('/', async (req, res, proximo) => {
         const  usuario = new Usuario(dadosRecebidos)
         const resultados = await usuario.criar()
         res.status(201)
+        const serializador = new SerializadorUsuario(
+            res.getHeader('Content-Type')
+        )
         res.send(
             JSON.stringify(resultados)
         )
@@ -26,22 +33,21 @@ roteador.post('/', async (req, res, proximo) => {
     }
 })
 
-roteador.get('/:idUsuario', async (req, res) => {
+roteador.get('/:idUsuario', async (req, res, proximo) => {
     try {
         const id = req.params.idUsuario
         const usuario = new Usuario({id: id})
         await usuario.buscarPorId()
         res.status(200)
+        const serializador = new SerializadorUsuario(
+            res.getHeader('Content-Type'),
+            ['email', 'dtCriacao', 'dtAtualizacao', 'versao']
+        )
         res.send(
-            JSON.stringify(usuario)
+            serializador.serializar(usuario)
         )
     } catch(erro) {
-        res.status(404)
-        res.send(
-            JSON.stringify({
-                mensagem: erro.message
-            })
-        )
+        proximo(erro)
     }
 })
 
@@ -59,7 +65,7 @@ roteador.put('/:idUsuario', async (req, res, proximo) => {
     }
 })
 
-roteador.delete('/:idUsuario',async (req, res) => {
+roteador.delete('/:idUsuario',async (req, res, proximo) => {
     try {
         const id = req.params.idUsuario
         const usuario = new Usuario({ id: id})
@@ -68,12 +74,7 @@ roteador.delete('/:idUsuario',async (req, res) => {
         res.status(204)
         res.end()
     } catch (erro) {
-        res.status(404)
-        res.send(
-            JSON.stringify({
-                mensagem: erro.message
-            })
-        ) 
+        proximo(erro)
     } 
 })
 
