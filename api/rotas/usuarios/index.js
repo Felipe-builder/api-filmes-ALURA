@@ -63,7 +63,7 @@ roteador.put('/:idUsuario', async (req, res, proximo) => {
     } catch (erro) {
         proximo(erro)
     }
-})
+}) 
 
 roteador.delete('/:idUsuario',async (req, res, proximo) => {
     try {
